@@ -1,0 +1,75 @@
+#ifndef CONFIGURACAOPERSISTENTE_H
+#define CONFIGURACAOPERSISTENTE_H
+
+#include <Arduino.h>
+#include "FS.h" // Biblioteca base do File System
+#include "SPIFFS.h" // Sistema de Arquivos SPIFFS
+#include <ArduinoJson.h> // Biblioteca necessária para serialização JSON
+
+// Define o tamanho do buffer JSON (ajuste se necessário)
+#define JSON_BUFFER_SIZE 256
+
+/**
+ * @brief Classe para armazenar a configuração e gerenciar a persistência na Flash (SPIFFS).
+ */
+class ConfiguracaoPersistente {
+private:
+    // Atributos de Configuração
+    int dia = 0;
+    int mes = 0;
+    int ano = 0;
+    int hora = 0;
+    int minuto = 0;
+    int segundo = 0;
+    int duracao = 0; 
+    int ciclo = 0;
+    bool _atualizada = false; 
+
+    const char* ARQUIVO_CONFIG = "/config.json"; // Nome do arquivo na Flash
+
+    // Função privada para inicializar o SPIFFS
+    bool initSPIFFS(); 
+
+public:
+    // Construtor
+    ConfiguracaoPersistente();
+
+    // Métodos de Persistência
+    bool carregar();
+    bool salvar();
+    bool _cancelarCiclo = false; // Método privado para cancelar ciclo (limpar config)
+
+    bool deveCancelarCiclo() const { return _cancelarCiclo; }
+    void solicitarCancelamentoCiclo() { _cancelarCiclo = true; }
+    void clearCancelarCiclo() { _cancelarCiclo = false; }
+    // Métodos de Controle (Setters)
+    void salvarTemporariamente(int d, int m, int a, int h, int min, int s, int dur, int c);
+    
+    // Métodos de Acesso (Getters)
+    void imprimir(); // Imprime a config atual no Serial
+    int getAno() const { return ano; }
+    int getCiclo() const { return ciclo; }
+    int getDia() const { return dia; }
+    int getMes() const { return mes; }
+    int getHora() const { return hora; }
+    int getMinuto() const { return minuto; }
+    int getSegundo() const { return segundo; }
+    int getDuracao() const { return duracao; }
+
+    void setDia(int d) { dia = d; }
+    void setMes(int m) { mes = m; }
+    void setAno(int a) { ano = a; }
+    void setHora(int h) { hora = h; }
+    void setMinuto(int m) { minuto = m; }
+    void setSegundo(int s) { segundo = s; }
+    void setDuracao(int d) { duracao = d; }
+    void setCiclo(int c) { ciclo = c; }
+    void setAtualizada(bool status) { _atualizada = status; }
+    
+    bool isAtualizada() const { return _atualizada; }
+    void clearAtualizada() { _atualizada = false; }
+    int getNumeroAtivacao() const { return numeroAtivacao; }
+    int numeroAtivacao = 0; // Contador de ativações para logs
+};
+
+#endif // CONFIGURACAOPERSISTENTE_H
